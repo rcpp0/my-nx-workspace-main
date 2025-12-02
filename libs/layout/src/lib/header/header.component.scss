@@ -32,6 +32,7 @@
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .header-brand {
@@ -58,6 +59,37 @@
 
 .header-title {
   margin: 0;
+}
+
+.header-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--header-text);
+  padding: 0.5rem;
+  border-radius: var(--bs-border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  font-size: 1.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+
+  &:hover,
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--header-brand-hover);
+  }
+
+  &:focus {
+    outline: 2px solid var(--header-text);
+    outline-offset: 2px;
+  }
+
+  &:active {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
 }
 
 // ============================================

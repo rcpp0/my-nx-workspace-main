@@ -1,0 +1,38 @@
+// ============================================
+// 1. VARIABLES CSS CUSTOM DU COMPONENT
+// ============================================
+:host {
+  // Variables de layout
+  --toast-container-z-index: 1055; // Bootstrap toast z-index
+  --toast-container-gap: 0.5rem;
+
+  display: block;
+}
+
+// ============================================
+// 2. STYLES DU COMPONENT
+// ============================================
+.toast-container {
+  z-index: var(--toast-container-z-index);
+  display: flex;
+  flex-direction: column;
+  gap: var(--toast-container-gap);
+  pointer-events: none;
+}
+
+// Activer les interactions sur les toasts individuels
+.toast-container > * {
+  pointer-events: auto;
+}
+
+// ============================================
+// 3. RESPONSIVE
+// ============================================
+@media (max-width: 576px) {
+  .toast-container {
+    left: 0;
+    right: 0;
+    padding: 0.5rem !important;
+  }
+}
+

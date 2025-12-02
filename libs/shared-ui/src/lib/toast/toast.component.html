@@ -1,0 +1,19 @@
+<div
+  #toastElement
+  [class]="getToastClasses()"
+  role="alert"
+  aria-live="assertive"
+  aria-atomic="true"
+>
+  <div class="toast-header">
+    <i [class]="getIconClasses()" aria-hidden="true"></i>
+    <strong class="me-auto">{{ toast().message }}</strong>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Fermer"
+      (click)="handleClose()"
+    ></button>
+  </div>
+</div>
+

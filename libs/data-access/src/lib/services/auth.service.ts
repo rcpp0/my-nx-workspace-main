@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Observable, of, delay, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import type {
   User,
   LoginRequest,

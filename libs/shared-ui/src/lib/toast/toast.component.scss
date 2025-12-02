@@ -1,0 +1,56 @@
+// ============================================
+// 1. VARIABLES CSS CUSTOM DU COMPONENT
+// ============================================
+:host {
+  // Variables de layout
+  --toast-width: 350px;
+  --toast-max-width: 100%;
+
+  display: block;
+}
+
+// ============================================
+// 2. STYLES DU COMPONENT
+// ============================================
+.toast {
+  width: var(--toast-width);
+  max-width: var(--toast-max-width);
+  min-width: 300px;
+}
+
+.toast-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--bs-white);
+  border-bottom: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;
+
+  i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  strong {
+    flex-grow: 1;
+  }
+}
+
+.btn-close {
+  flex-shrink: 0;
+}
+
+// ============================================
+// 3. RESPONSIVE
+// ============================================
+@media (max-width: 576px) {
+  :host {
+    --toast-width: 100%;
+  }
+
+  .toast {
+    min-width: auto;
+  }
+}
+
