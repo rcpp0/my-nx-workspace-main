@@ -8,11 +8,20 @@ import { API_CONFIG } from '@mini-crm/data-access';
 import { appRoutes } from './app.routes';
 import { environment } from '../environments/environment';
 
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { ordersReducer, orderEffects } from '@mini-crm/feature-orders';
+
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideRouter(appRoutes),
     provideHttpClient(),
+    provideStore({
+      orders: ordersReducer,
+    }),
+    provideEffects(orderEffects),
     // Configuration API
     {
       provide: API_CONFIG,

@@ -33,6 +33,15 @@
       "tauxTva": 20,
       "totalHt": 1800,
       "totalTtc": 2160
+    },
+    {
+      "id": 4,
+      "customer": "pouet",
+      "nbDays": 1,
+      "tjm": 0,
+      "tauxTva": 20,
+      "totalHt": 0,
+      "totalTtc": 0
     }
   ]
 }

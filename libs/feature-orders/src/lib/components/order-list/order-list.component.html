@@ -52,7 +52,7 @@
                   <button
                     type="button"
                     class="btn btn-sm btn-outline-primary"
-                    (click)="onEdit(order.id)"
+                    (click)="onEdit(order.id!)"
                     [attr.aria-label]="'Éditer la commande ' + order.customer"
                   >
                     <i class="bi bi-pencil" aria-hidden="true"></i>
@@ -61,7 +61,7 @@
                   <button
                     type="button"
                     class="btn btn-sm btn-outline-danger"
-                    (click)="onDeleteClick(order.id)"
+                    (click)="onDeleteClick(order.id!)"
                     [attr.aria-label]="'Supprimer la commande ' + order.customer"
                   >
                     <i class="bi bi-trash" aria-hidden="true"></i>

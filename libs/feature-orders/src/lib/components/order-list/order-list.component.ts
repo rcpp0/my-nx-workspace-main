@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@ang
 import { Router, RouterLink } from '@angular/router';
 import { OrdersService } from '@mini-crm/data-access';
 import { ConfirmModalComponent } from '@mini-crm/shared-ui';
-import type { Order as OrderType } from '@mini-crm/data-access';
+import type { OrderDetail as OrderType } from '@mini-crm/data-access';
 
 // Bootstrap Modal type from @types/bootstrap
 declare const bootstrap: {

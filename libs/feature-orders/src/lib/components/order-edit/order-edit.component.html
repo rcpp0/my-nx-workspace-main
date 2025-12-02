@@ -14,15 +14,17 @@
     </div>
   }
 
-  @if (order() && !loading()) {
-    <div class="card">
-      <div class="card-header">
-        <h2 class="h4 mb-0">Modifier la commande</h2>
+  @if (order(); as currentOrder) {
+    @if (!loading()) {
+      <div class="card">
+        <div class="card-header">
+          <h2 class="h4 mb-0">Modifier la commande</h2>
+        </div>
+        <div class="card-body">
+          <lib-order-form [order]="currentOrder" (save)="onSave($event)" (canceled)="onCancel()" />
+        </div>
       </div>
-      <div class="card-body">
-        <lib-order-form [order]="order()!" (save)="onSave($event)" (canceled)="onCancel()" />
-      </div>
-    </div>
+    }
   }
 </div>
 

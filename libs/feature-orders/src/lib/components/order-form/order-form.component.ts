@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import type { Order, UpdateOrder } from '@mini-crm/data-access';
+import type { OrderDetail, UpdateOrder } from '@mini-crm/data-access';
 
 /**
  * Reusable form component for creating and editing orders.
@@ -69,7 +69,7 @@ export class OrderFormComponent {
    * Order to edit (null for creation mode).
    * @required
    */
-  order = input<Order | null>(null);
+  order = input<OrderDetail | null>(null);
 
   /**
    * Emitted when the form is submitted with valid data.

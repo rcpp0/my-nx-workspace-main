@@ -1,8 +1,15 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit, signal, effect } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  OnInit,
+  effect,
+  computed,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrdersService } from '@mini-crm/data-access';
 import { OrderFormComponent } from '../order-form/order-form.component';
-import type { Order, UpdateOrder } from '@mini-crm/data-access';
+import type { OrderDetail, UpdateOrder } from '@mini-crm/data-access';
+import { OrdersStoreService } from '../../store/orders-store-service';
 
 /**
  * Component for editing an existing order.
@@ -25,7 +32,7 @@ import type { Order, UpdateOrder } from '@mini-crm/data-access';
  * the component automatically redirects to the orders list.
  *
  * @see OrderFormComponent
- * @see OrdersService
+ * @see OrdersStoreService
  * @see OrderAddComponent
  * @category Feature Orders
  */
@@ -37,36 +44,67 @@ import type { Order, UpdateOrder } from '@mini-crm/data-access';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderEditComponent implements OnInit {
-  private readonly ordersService = inject(OrdersService);
+  private readonly orderStoreService = inject(OrdersStoreService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
   /**
-   * Order to edit, loaded from the service.
+   * Selected order from the store.
    * @readonly
    */
-  order = signal<Order | null>(null);
+  readonly selectedOrder = this.orderStoreService.selected;
 
   /**
-   * Loading state from the service.
+   * Loading state from the store.
    * @readonly
    */
-  loading = this.ordersService.loading;
+  readonly loading = this.orderStoreService.loading;
 
   /**
-   * Error message from the service.
+   * Error state from the store.
    * @readonly
    */
-  error = this.ordersService.error;
+  readonly error = this.orderStoreService.error;
+
+  /**
+   * Order to edit with calculated totals.
+   * Computed from selectedOrder with totalHt and totalTtc calculated.
+   * @readonly
+   * @computed
+   */
+  readonly order = computed((): OrderDetail | null => {
+    const baseOrder = this.selectedOrder();
+    if (!baseOrder) {
+      return null;
+    }
+
+    const nbDays = baseOrder.nbDays ?? 0;
+    const tjm = baseOrder.tjm ?? 0;
+    const tauxTva = baseOrder.tauxTva ?? 0;
+
+    const totalHt = nbDays * tjm;
+    const totalTtc = totalHt * (1 + tauxTva / 100);
+
+    return {
+      ...baseOrder,
+      totalHt,
+      totalTtc,
+    };
+  });
 
   constructor() {
     // Redirect to orders list if order becomes null (not found)
     effect(() => {
       const orderValue = this.order();
       const errorValue = this.error();
-      
+      const loadingValue = this.loading();
+
       // If order is null and we have an error, redirect to list
-      if (orderValue === null && errorValue && !this.loading()) {
+      if (
+        orderValue === null &&
+        errorValue &&
+        !loadingValue
+      ) {
         console.error('Order not found, redirecting to orders list');
         this.router.navigate(['/orders']);
       }
@@ -76,7 +114,7 @@ export class OrderEditComponent implements OnInit {
   ngOnInit(): void {
     // Get order ID from route parameters
     const orderIdParam = this.route.snapshot.paramMap.get('id');
-    
+
     if (!orderIdParam) {
       console.error('Order ID is missing from route parameters');
       this.router.navigate(['/orders']);
@@ -84,24 +122,16 @@ export class OrderEditComponent implements OnInit {
     }
 
     const orderId = Number.parseInt(orderIdParam, 10);
-    
+
     if (Number.isNaN(orderId)) {
       console.error(`Invalid order ID: ${orderIdParam}`);
       this.router.navigate(['/orders']);
       return;
     }
 
-    // Load order by ID
-    this.ordersService.getById(orderId).subscribe({
-      next: (order) => {
-        this.order.set(order);
-      },
-      error: (err) => {
-        console.error('Failed to load order:', err);
-        // Error handling will trigger redirect via effect
-        this.order.set(null);
-      },
-    });
+    // Load orders list (selectedOrder will be set by effects/selectors based on ID)
+    // TODO: Implement loadOrderById action if needed
+    this.orderStoreService.load();
   }
 
   /**
@@ -111,16 +141,9 @@ export class OrderEditComponent implements OnInit {
    * @param orderData - Order data to update
    */
   onSave(orderData: UpdateOrder): void {
-    this.ordersService.update(orderData).subscribe({
-      next: () => {
-        // Navigate to orders list after successful update
-        this.router.navigate(['/orders']);
-      },
-      error: (err) => {
-        console.error('Failed to update order:', err);
-        // Stay on the page to allow user to retry
-      },
-    });
+    this.orderStoreService.update(orderData);
+    // Navigation will be handled by effects or after successful update
+    this.router.navigate(['/orders']);
   }
 
   /**

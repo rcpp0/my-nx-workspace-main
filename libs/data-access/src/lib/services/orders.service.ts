@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, throwError, tap } from 'rxjs';
 import { API_CONFIG } from '../config/api.config';
-import type { Order, CreateOrder, UpdateOrder } from '../models/order.model';
+import type { OrderDetail, CreateOrder, UpdateOrder } from '../models/order.model';
 
 /**
  * Service for managing orders data and operations.
@@ -44,7 +44,7 @@ import type { Order, CreateOrder, UpdateOrder } from '../models/order.model';
  * });
  * ```
  *
- * @see Order
+ * @see OrderDetail
  * @see CreateOrder
  * @see UpdateOrder
  * @category Data Access
@@ -56,7 +56,7 @@ export class OrdersService {
   private readonly apiUrl = `${this.config.apiUrl}/orders`;
 
   // Private writable signals
-  #orders = signal<Order[]>([]);
+  #orders = signal<OrderDetail[]>([]);
   #loading = signal<boolean>(false);
   #error = signal<string | null>(null);
 
@@ -96,11 +96,11 @@ export class OrdersService {
    * });
    * ```
    */
-  getAll(): Observable<Order[]> {
+  getAll(): Observable<OrderDetail[]> {
     this.#loading.set(true);
     this.#error.set(null);
 
-    return this.http.get<Order[]>(this.apiUrl).pipe(
+    return this.http.get<OrderDetail[]>(this.apiUrl).pipe(
       tap((orders) => {
         this.#orders.set(orders);
         this.#loading.set(false);
@@ -129,7 +129,7 @@ export class OrdersService {
    * });
    * ```
    */
-  getById(id: number): Observable<Order> {
+  getById(id: number): Observable<OrderDetail> {
     // Try to get from local signal first
     const localOrder = this.#orders().find((o) => o.id === id);
     if (localOrder) {
@@ -143,7 +143,7 @@ export class OrdersService {
     this.#loading.set(true);
     this.#error.set(null);
 
-    return this.http.get<Order>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.get<OrderDetail>(`${this.apiUrl}/${id}`).pipe(
       catchError((error: HttpErrorResponse) => {
         this.#loading.set(false);
         this.#error.set(this.getErrorMessage(error));
@@ -178,7 +178,7 @@ export class OrdersService {
    * });
    * ```
    */
-  create(orderData: CreateOrder): Observable<Order> {
+  create(orderData: CreateOrder): Observable<OrderDetail> {
     this.#loading.set(true);
     this.#error.set(null);
 
@@ -186,13 +186,13 @@ export class OrdersService {
     const totalHt = orderData.nbDays * orderData.tjm;
     const totalTtc = totalHt * (1 + orderData.tauxTva / 100);
 
-    const orderPayload: Omit<Order, 'id'> = {
+    const orderPayload: Omit<OrderDetail, 'id'> = {
       ...orderData,
       totalHt,
       totalTtc,
     };
 
-    return this.http.post<Order>(this.apiUrl, orderPayload).pipe(
+    return this.http.post<OrderDetail>(this.apiUrl, orderPayload).pipe(
       tap(() => {
         // Refresh orders list after successful creation
         this.refresh();
@@ -232,7 +232,7 @@ export class OrdersService {
    * });
    * ```
    */
-  update(orderData: UpdateOrder): Observable<Order> {
+  update(orderData: UpdateOrder): Observable<OrderDetail> {
     this.#loading.set(true);
     this.#error.set(null);
 
@@ -240,13 +240,13 @@ export class OrdersService {
     const totalHt = orderData.nbDays * orderData.tjm;
     const totalTtc = totalHt * (1 + orderData.tauxTva / 100);
 
-    const orderPayload: Order = {
+    const orderPayload: OrderDetail = {
       ...orderData,
       totalHt,
       totalTtc,
     };
 
-    return this.http.put<Order>(`${this.apiUrl}/${orderData.id}`, orderPayload).pipe(
+    return this.http.put<OrderDetail>(`${this.apiUrl}/${orderData.id}`, orderPayload).pipe(
       tap(() => {
         // Refresh orders list after successful update
         this.refresh();

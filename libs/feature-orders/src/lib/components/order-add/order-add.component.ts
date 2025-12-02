@@ -1,8 +1,9 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { OrdersService } from '@mini-crm/data-access';
+
 import { OrderFormComponent } from '../order-form/order-form.component';
 import type { CreateOrder } from '@mini-crm/data-access';
+import { OrdersStoreService } from '../../store/orders-store-service';
 
 /**
  * Component for adding a new order.
@@ -32,7 +33,8 @@ import type { CreateOrder } from '@mini-crm/data-access';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderAddComponent {
-  private readonly ordersService = inject(OrdersService);
+
+  private readonly ordersStoreService = inject(OrdersStoreService);
   private readonly router = inject(Router);
 
   /**
@@ -42,16 +44,8 @@ export class OrderAddComponent {
    * @param orderData - Order data to create
    */
   onSave(orderData: CreateOrder): void {
-    this.ordersService.create(orderData).subscribe({
-      next: () => {
-        // Navigate to orders list after successful creation
-        this.router.navigate(['/orders']);
-      },
-      error: (err) => {
-        console.error('Failed to create order:', err);
-        // Stay on the page to allow user to retry
-      },
-    });
+    this.ordersStoreService.add(orderData);
+    this.router.navigate(['/orders']);
   }
 
   /**
