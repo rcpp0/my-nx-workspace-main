@@ -102,7 +102,7 @@ export class SignInComponent {
         this.loading.set(false);
         // Show success toast with welcome message
         this.toastService.showSuccess(
-          `Authentification réussie. Bienvenue, ${credentials.email}`
+          `Bonjour, ${credentials.email} 😊`
         );
         // Redirect to orders page on successful login
         this.router.navigate(['/orders']);

@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+import { authGuard } from '@mini-crm/feature-auth';
 
 /**
  * Routes principales de l'application
@@ -25,10 +26,9 @@ export const appRoutes: Route[] = [
   // Routes des commandes (protégées par authGuard)
   {
     path: 'orders',
+    canActivate: [authGuard],
     loadChildren: () =>
       import('@mini-crm/feature-orders').then((m) => m.ORDERS_ROUTES),
-    // TODO: Décommenter quand authGuard sera implémenté
-    // canActivate: [authGuard],
   },
 
   // Route 404 (optionnel, à implémenter plus tard)

@@ -1,8 +1,9 @@
 // TODO Formation : Décommenter les imports suivants
 // import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
 // import { Router } from '@angular/router';
-// import { AuthService } from '@mini-crm/data-access';
+import { AuthService } from '@mini-crm/data-access';
 
 /**
  * Authentication guard to protect routes.
@@ -42,6 +43,9 @@ import { CanActivateFn } from '@angular/router';
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const authGuard: CanActivateFn = (_route, _state) => {
+
+  const authService = inject(AuthService);
+  const router = inject(Router);
   // TODO Formation : Implémenter la vérification d'authentification
   // Pour l'instant, le guard laisse passer toutes les routes pour le développement
 
@@ -58,6 +62,10 @@ export const authGuard: CanActivateFn = (_route, _state) => {
   //   queryParams: { returnUrl: state.url }
   // });
 
-  return true;
+  if (authService.isAuthenticated()) {
+    return true;
+  } else {
+    return router.createUrlTree(['/auth/sign-in']);
+  }
 };
 
