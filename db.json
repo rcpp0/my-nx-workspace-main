@@ -1,5 +1,11 @@
 {
-  "users": [],
+  "users": [
+    {
+      "email": "romain@axess.fr",
+      "password": "$2a$10$9SOphkvDS.PEZB1S6DbrjOo/aSEjpHuhtIsK8Tlq9yrXK/0Ya6Y3K",
+      "id": 1
+    }
+  ],
   "orders": [
     {
       "id": 1,

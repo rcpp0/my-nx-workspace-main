@@ -44,6 +44,14 @@ export class SignInComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
+
+  constructor() {
+    const token = this.authService.token();
+    if (token) {
+      this.router.navigate(['/orders']);
+    }
+  }
+
   /**
    * Loading state for form submission.
    */

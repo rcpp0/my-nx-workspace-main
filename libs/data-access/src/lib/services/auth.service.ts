@@ -6,164 +6,57 @@ import type {
   RegisterRequest,
   AuthResponse,
 } from '../models/auth.model';
-
-/**
- * Authentication service for user login, registration, and session management.
- *
- * **Note**: This service is currently mocked for training purposes.
- * Methods return mock data without making actual API calls.
- * Will be connected to json-server-auth in training.
- *
- * @usageNotes
- * ### Injecting the Service
- * ```typescript
- * private readonly authService = inject(AuthService);
- * ```
- *
- * ### Checking Authentication Status
- * ```typescript
- * if (this.authService.isAuthenticated()) {
- *   // User is authenticated
- * }
- * ```
- *
- * ### Signing In
- * ```typescript
- * this.authService.signIn({ email: 'user@example.com', password: 'password' })
- *   .subscribe({
- *     next: (response) => {
- *       // Token and user are automatically updated
- *       console.log('Logged in:', response.user);
- *     },
- *     error: (error) => console.error('Login failed:', error)
- *   });
- * ```
- *
- * @see User
- * @see LoginRequest
- * @see RegisterRequest
- * @see AuthResponse
- * @category Data Access
- */
+import { HttpClient } from '@angular/common/http';
+import { effect, inject } from '@angular/core';
+import { switchMap } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Private writable signals
-  #token = signal<string | null>(null);
-  #user = signal<User | null>(null);
+  private readonly tokenSignal = signal<string | null>(null);
+  private readonly userSignal = signal<User | null>(null);
 
-  // Public readonly signals
-  /**
-   * Current authentication token.
-   * @readonly
-   */
-  token = this.#token.asReadonly();
+  private readonly http = inject(HttpClient);
 
-  /**
-   * Current authenticated user.
-   * @readonly
-   */
-  user = this.#user.asReadonly();
+  readonly token = computed(() => this.tokenSignal());
+  readonly user = computed(() => this.userSignal());
+  readonly isAuthenticated = computed(() => !!this.tokenSignal());
 
-  /**
-   * Authentication status computed from token presence.
-   * @computed
-   */
-  isAuthenticated = computed(() => !!this.#token());
+  constructor() {
+    const existingToken = sessionStorage.getItem('authToken');
+    if (existingToken) {
+      console.log(`existingToken: ${existingToken}`);
+      this.tokenSignal.set(existingToken);
+    } else {
+      console.log('no existing token');
+    }
+  }
 
-  /**
-   * Signs in a user with email and password.
-   *
-   * **Mock implementation**: Returns mock data without API call.
-   * Updates token and user signals on success.
-   *
-   * @param credentials - Login credentials (email and password)
-   * @returns Observable of authentication response with access token and user data
-   *
-   * @example
-   * ```typescript
-   * this.authService.signIn({ email: 'user@example.com', password: 'password123' })
-   *   .subscribe({
-   *     next: (response) => console.log('Logged in:', response.user),
-   *     error: (error) => console.error('Login failed:', error)
-   *   });
-   * ```
-   */
+  private readonly storeInSessionStorageEffect = effect(() => {
+    const token = this.token();
+    if (token) {
+      sessionStorage.setItem('authToken', token);
+    } else {
+      sessionStorage.removeItem('authToken');
+    }
+  })
+
   signIn(credentials: LoginRequest): Observable<AuthResponse> {
-    // Mock implementation - returns mock data after a delay
-    const mockResponse: AuthResponse = {
-      accessToken: 'mock-jwt-token-' + Date.now(),
-      user: {
-        id: 1,
-        email: credentials.email,
-      },
-    };
-
-    return of(mockResponse).pipe(
-      delay(500), // Simulate network delay
-      tap((response) => this.updateAuthState(response)) // Update signals automatically
-    );
+    return this.http.post<AuthResponse>('http://localhost:3000/login', credentials)
+    .pipe(tap(response => {
+      console.log(`signIn: ${response.accessToken}`);
+      this.tokenSignal.set(response.accessToken);
+      this.userSignal.set({ email: credentials.email });
+    }))
+     
   }
 
-  /**
-   * Registers a new user account.
-   *
-   * **Mock implementation**: Returns mock data without API call.
-   * Updates token and user signals on success.
-   *
-   * @param credentials - Registration credentials (email and password)
-   * @returns Observable of authentication response with access token and user data
-   *
-   * @example
-   * ```typescript
-   * this.authService.signUp({ email: 'new@example.com', password: 'password123' })
-   *   .subscribe({
-   *     next: (response) => console.log('Registered:', response.user),
-   *     error: (error) => console.error('Registration failed:', error)
-   *   });
-   * ```
-   */
   signUp(credentials: RegisterRequest): Observable<AuthResponse> {
-    // Mock implementation - returns mock data after a delay
-    const mockResponse: AuthResponse = {
-      accessToken: 'mock-jwt-token-' + Date.now(),
-      user: {
-        id: Math.floor(Math.random() * 1000) + 1,
-        email: credentials.email,
-      },
-    };
-
-    return of(mockResponse).pipe(
-      delay(500), // Simulate network delay
-      tap((response) => this.updateAuthState(response)) // Update signals automatically
-    );
+    return this.http.post<AuthResponse>('http://localhost:3000/register', credentials)
+    .pipe(switchMap(() => this.signIn(credentials)))
   }
 
-  /**
-   * Signs out the current user.
-   *
-   * Clears the authentication token and user data.
-   *
-   * @example
-   * ```typescript
-   * this.authService.logout();
-   * // Token and user signals are cleared
-   * ```
-   */
   logout(): void {
-    this.#token.set(null);
-    this.#user.set(null);
-  }
-
-  /**
-   * Updates authentication state from an AuthResponse.
-   * Internal method used by signIn and signUp after successful authentication.
-   *
-   * @internal
-   * @param response - Authentication response containing token and user
-   */
-  private updateAuthState(response: AuthResponse): void {
-    this.#token.set(response.accessToken);
-    this.#user.set(response.user);
+    this.tokenSignal.set(null);
+    this.userSignal.set(null);
   }
 }
 
