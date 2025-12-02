@@ -35,3 +35,8 @@ export const ordersLoaded = createAction(
     '[Orders] Orders Loaded',
     props<{ orders: OrderDetail[] }>()
 );
+
+export const ordersError = createAction(
+    '[Orders] Orders Error',
+    props<{ error: string }>()
+);

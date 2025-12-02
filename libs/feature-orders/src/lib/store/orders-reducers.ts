@@ -1,5 +1,5 @@
 import { createReducer, on } from "@ngrx/store";
-import { addOrder, updateOrder , deleteOrder, orderAdded, orderUpdated} from "./orders-actions";
+import { addOrder, updateOrder , deleteOrder, orderAdded, orderUpdated, ordersError} from "./orders-actions";
 import { OrdersState } from "./orders-state";
 
 
@@ -27,5 +27,9 @@ export const ordersReducer = createReducer(
 
     on(deleteOrder, (state, { id }) => {
         return { ...state, orders: state.orders.filter(o => o.id !== id) };
+    }),
+
+    on(ordersError, (state, { error }) => {
+        return { ...state, error: error };
     })
 );
