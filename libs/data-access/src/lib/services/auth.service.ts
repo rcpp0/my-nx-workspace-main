@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { catchError, Observable, tap } from 'rxjs';
 import type {
   User,
   LoginRequest,
@@ -9,6 +9,7 @@ import type {
 import { HttpClient } from '@angular/common/http';
 import { effect, inject } from '@angular/core';
 import { switchMap } from 'rxjs';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly tokenSignal = signal<string | null>(null);
@@ -19,6 +20,7 @@ export class AuthService {
   readonly token = computed(() => this.tokenSignal());
   readonly user = computed(() => this.userSignal());
   readonly isAuthenticated = computed(() => !!this.tokenSignal());
+
 
   constructor() {
     const existingToken = sessionStorage.getItem('authToken');

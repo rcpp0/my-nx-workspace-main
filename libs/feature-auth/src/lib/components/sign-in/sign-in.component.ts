@@ -7,6 +7,7 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@mini-crm/data-access';
+import { ToastService } from '@mini-crm/shared-ui';
 import type { LoginRequest } from '@mini-crm/data-access';
 
 /**
@@ -43,6 +44,7 @@ export class SignInComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly toastService = inject(ToastService);
 
 
   constructor() {
@@ -98,14 +100,22 @@ export class SignInComponent {
     this.authService.signIn(credentials).subscribe({
       next: () => {
         this.loading.set(false);
+        // Show success toast with welcome message
+        this.toastService.showSuccess(
+          `Authentification réussie. Bienvenue, ${credentials.email}`
+        );
         // Redirect to orders page on successful login
         this.router.navigate(['/orders']);
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(
-          err.message || 'Une erreur est survenue lors de la connexion'
-        );
+        if (err.status === 401) {
+          this.error.set('Email ou mot de passe incorrect');
+          this.toastService.showError('Email ou mot de passe incorrect');
+        } else {
+          this.error.set('Une erreur est survenue lors de la connexion');
+          this.toastService.showError('Une erreur est survenue lors de la connexion');
+        }
       },
     });
   }
