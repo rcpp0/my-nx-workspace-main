@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { OrdersService } from '@mini-crm/data-access';
 import { ConfirmModalComponent } from '@mini-crm/shared-ui';
-import type { OrderDetail as OrderType } from '@mini-crm/data-access';
+import type { OrderDetail } from '@mini-crm/data-access';
+import { ordersSignalStore } from '../../store/orders-signal-store';
 
 // Bootstrap Modal type from @types/bootstrap
 declare const bootstrap: {
@@ -38,7 +38,7 @@ declare const bootstrap: {
  * }
  * ```
  *
- * @see OrdersService
+ * @see ordersSignalStore
  * @see ConfirmModalComponent
  * @see Order
  * @category Feature Orders
@@ -51,7 +51,7 @@ declare const bootstrap: {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderListComponent implements OnInit {
-  private readonly ordersService = inject(OrdersService);
+  private readonly orderStore = inject(ordersSignalStore);
   private readonly router = inject(Router);
 
   /**
@@ -65,33 +65,26 @@ export class OrderListComponent implements OnInit {
   private readonly MODAL_ID = 'deleteOrderModal';
 
   /**
-   * Orders list from the service.
+   * Orders list from the store.
    * @readonly
    */
-  orders = this.ordersService.orders as typeof this.ordersService.orders & { (): OrderType[] };
+  readonly orders = this.orderStore.orders;
 
   /**
-   * Loading state from the service.
+   * Loading state from the store.
    * @readonly
    */
-  loading = this.ordersService.loading;
+  readonly loading = this.orderStore.loading;
 
   /**
-   * Error message from the service.
+   * Error message from the store.
    * @readonly
    */
-  error = this.ordersService.error;
+  readonly error = this.orderStore.error;
 
   ngOnInit(): void {
     // Load orders on component initialization
-    this.ordersService.getAll().subscribe({
-      next: () => {
-        // Orders are automatically updated in the service signal
-      },
-      error: (err) => {
-        console.error('Failed to load orders:', err);
-      },
-    });
+    this.orderStore.loadOrders();
   }
 
   /**
@@ -125,16 +118,9 @@ export class OrderListComponent implements OnInit {
       return;
     }
 
-    this.ordersService.delete(orderId).subscribe({
-      next: () => {
-        // Orders list is automatically refreshed by the service
-        this.orderToDeleteId.set(null);
-      },
-      error: (err) => {
-        console.error('Failed to delete order:', err);
-        this.orderToDeleteId.set(null);
-      },
-    });
+    // Delete order using the store
+    this.orderStore.deleteOrder(orderId);
+    this.orderToDeleteId.set(null);
   }
 
   /**

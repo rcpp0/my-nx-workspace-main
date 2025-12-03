@@ -9,7 +9,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderFormComponent } from '../order-form/order-form.component';
 import type { OrderDetail, UpdateOrder } from '@mini-crm/data-access';
-import { OrdersStoreService } from '../../store/orders-store-service';
+import { ordersSignalStore } from '../../store/orders-signal-store';
 
 /**
  * Component for editing an existing order.
@@ -32,7 +32,7 @@ import { OrdersStoreService } from '../../store/orders-store-service';
  * the component automatically redirects to the orders list.
  *
  * @see OrderFormComponent
- * @see OrdersStoreService
+ * @see ordersSignalStore
  * @see OrderAddComponent
  * @category Feature Orders
  */
@@ -44,7 +44,7 @@ import { OrdersStoreService } from '../../store/orders-store-service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderEditComponent implements OnInit {
-  private readonly orderStoreService = inject(OrdersStoreService);
+  private readonly orderStore = inject(ordersSignalStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -52,19 +52,19 @@ export class OrderEditComponent implements OnInit {
    * Selected order from the store.
    * @readonly
    */
-  readonly selectedOrder = this.orderStoreService.selected;
+  readonly selectedOrder = this.orderStore.selectedOrder;
 
   /**
    * Loading state from the store.
    * @readonly
    */
-  readonly loading = this.orderStoreService.loading;
+  readonly loading = this.orderStore.loading;
 
   /**
    * Error state from the store.
    * @readonly
    */
-  readonly error = this.orderStoreService.error;
+  readonly error = this.orderStore.error;
 
   /**
    * Order to edit with calculated totals.
@@ -129,9 +129,8 @@ export class OrderEditComponent implements OnInit {
       return;
     }
 
-    // Load orders list (selectedOrder will be set by effects/selectors based on ID)
-    // TODO: Implement loadOrderById action if needed
-    this.orderStoreService.load();
+    // Load order by ID (will set selectedOrder)
+    this.orderStore.selectOrder(orderId);
   }
 
   /**
@@ -141,8 +140,8 @@ export class OrderEditComponent implements OnInit {
    * @param orderData - Order data to update
    */
   onSave(orderData: UpdateOrder): void {
-    this.orderStoreService.update(orderData);
-    // Navigation will be handled by effects or after successful update
+    this.orderStore.updateOrder(orderData);
+    // Navigation after successful update
     this.router.navigate(['/orders']);
   }
 

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { OrderFormComponent } from '../order-form/order-form.component';
 import type { CreateOrder } from '@mini-crm/data-access';
-import { OrdersStoreService } from '../../store/orders-store-service';
+import { ordersSignalStore } from '../../store/orders-signal-store';
 
 /**
  * Component for adding a new order.
@@ -34,7 +34,7 @@ import { OrdersStoreService } from '../../store/orders-store-service';
 })
 export class OrderAddComponent {
 
-  private readonly ordersStoreService = inject(OrdersStoreService);
+  private readonly orderStore = inject(ordersSignalStore);
   private readonly router = inject(Router);
 
   /**
@@ -44,7 +44,7 @@ export class OrderAddComponent {
    * @param orderData - Order data to create
    */
   onSave(orderData: CreateOrder): void {
-    this.ordersStoreService.add(orderData);
+    this.orderStore.addOrder(orderData);
     this.router.navigate(['/orders']);
   }
 
