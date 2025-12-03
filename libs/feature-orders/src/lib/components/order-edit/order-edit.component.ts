@@ -42,6 +42,7 @@ import { ordersSignalStore } from '../../store/orders-signal-store';
   templateUrl: './order-edit.component.html',
   styleUrl: './order-edit.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ordersSignalStore],
 })
 export class OrderEditComponent implements OnInit {
   private readonly orderStore = inject(ordersSignalStore);

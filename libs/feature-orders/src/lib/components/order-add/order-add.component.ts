@@ -31,6 +31,7 @@ import { ordersSignalStore } from '../../store/orders-signal-store';
   templateUrl: './order-add.component.html',
   styleUrl: './order-add.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ordersSignalStore],
 })
 export class OrderAddComponent {
 

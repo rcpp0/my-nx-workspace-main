@@ -49,6 +49,7 @@ declare const bootstrap: {
   templateUrl: './order-list.component.html',
   styleUrl: './order-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [ordersSignalStore],
 })
 export class OrderListComponent implements OnInit {
   private readonly orderStore = inject(ordersSignalStore);

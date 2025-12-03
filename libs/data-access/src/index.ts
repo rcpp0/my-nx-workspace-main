@@ -9,5 +9,8 @@ export * from './lib/models/order.model';
 export * from './lib/services/auth.service';
 export * from './lib/services/orders.service';
 
+// Interceptors
+export * from './lib/interceptors/errors.interceptor';
+
 // Components
 export * from './lib/data-access/data-access';

@@ -179,6 +179,7 @@ export class OrdersService {
    * ```
    */
   create(orderData: CreateOrder): Observable<OrderDetail> {
+    console.log(`Adding order : `, orderData);
     this.#loading.set(true);
     this.#error.set(null);
 
@@ -233,6 +234,7 @@ export class OrdersService {
    * ```
    */
   update(orderData: UpdateOrder): Observable<OrderDetail> {
+    console.log(`Updating order with value =`, orderData);
     this.#loading.set(true);
     this.#error.set(null);
 
