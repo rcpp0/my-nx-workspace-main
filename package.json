@@ -51,6 +51,8 @@
     "@angular/platform-browser": "~20.1.0",
     "@angular/router": "~20.1.0",
     "@ngrx/effects": "^20.1.0",
+    "@ngrx/operators": "^20.1.0",
+    "@ngrx/signals": "^20.1.0",
     "@ngrx/store": "^20.1.0",
     "@ngrx/store-devtools": "^20.1.0",
     "bootstrap": "^5.3.8",
